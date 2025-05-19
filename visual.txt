@@ -1,0 +1,41 @@
+Client
+  │
+  └─▶ sends HTTP POST with a JSON body
+         {
+           "mood":"happy",
+           "anxiety_level":3,
+           …  
+         }
+  │
+Server (DRF)
+  │
+  ├─▶ parses JSON into   request.data   (a Python dict)
+  │
+  ├─▶ Serializer(data=request.data)
+  │
+  ├─▶ serializer.is_valid()  
+  │      – checks types & rules  
+  │      – populates serializer.validated_data (a clean dict)
+  │
+  ├─▶ instance = serializer.save()  
+  │      – calls Model.objects.create(**validated_data)  
+  │      – returns a Django model instance with all fields set
+  │
+  ├─▶ out_serializer = Serializer(instance)  
+  │
+  ├─▶ out_serializer.data  
+  │      – reads model fields  
+  │      – runs to_representation() → a Python dict  
+  │
+  └─▶ return Response(out_serializer.data, status=201)
+           DRF’s JSONRenderer turns that dict back into JSON
+  │
+Client
+  │
+  └─▶ receives HTTP 201 with JSON body
+         {
+           "id": 1,
+           "date": "2025-05-18",
+           "mood": "happy",
+           …  
+         }
